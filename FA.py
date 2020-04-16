@@ -9,11 +9,11 @@ import codecs
 export = open('export.json')
 data = json.load(codecs.open('export.json', 'r+', 'utf-8-sig'))
 
-
+#fixed=input('Did you already fix the player names? (only say yes if you already ran the script with the current offers.csv and fixed the names)\n (type \'y\' or \'n\')')
 offers= pd.read_csv('offers.csv', names=['time','user','team','player','salary','years','pitch'],header=0)
 
 pd.options.mode.chained_assignment = None
-
+current_year=data['gameAttributes'][44]['value']
 
 #reading tier tables
 
@@ -69,6 +69,15 @@ def get_player(name,output=1):
 
 def get_player_age(name):
     return current_year - get_player(name)['born']['year']
+
+def get_player_fa(name):
+    for player in data['players']:
+        if name == player['firstName'] + ' ' + player['lastName']:
+            if player['tid'] != -1:
+                continue
+            if player['tid'] == -1:
+                return 1
+    return -1
 
 def get_player_ratings(name):
     for player in data['players']:
@@ -137,9 +146,11 @@ def sign_player(name,team,salary,years,rookie = False):
                 player['contract']['amount'] = salary * 1000
                 player['contract']['exp'] = current_year + years
                 player['tid'] = team
-                print('\nSigned {0} to the {1} for ${2}m until {3}.'.format(player['firstName'] + ' ' + player['lastName']
-                    ,teamname_from_tid(player['tid']),player['contract']['amount']/1000,player['contract']['exp']))
-                print("> **__FA Signing__**\n> {5} **{0}** signs a {1}-year, ${2}M contract with the :{4}: @{3} \n".format(player['firstName'] + ' ' + player['lastName'],years,salary ,teamname_from_tid(team),teamname_to_emoji[teamname_from_tid(team)], get_player_pos(name)))
+                if(rookie==False):
+                    print('\nSigned {0} to the {1} for ${2}m until {3}.'.format(player['firstName'] + ' ' + player['lastName']
+                        ,teamname_from_tid(player['tid']),player['contract']['amount']/1000,player['contract']['exp']))
+                    print("> **__FA Signing__**\n> {5} **{0}** ({6}/{7}) signs a {1}-year, ${2}M contract with the :{4}: @{3} \n".format(player['firstName'] + ' ' + player['lastName'],int(years),salary ,teamname_from_tid(team),
+                    teamname_to_emoji[teamname_from_tid(team)], get_player_pos(name),int(get_player_ratings(name)['ovr']),int(get_player_ratings(name)['pot'])))
 
 
                 return 1
@@ -152,9 +163,12 @@ def validate_player(name):
     if (name == 'c'):
         return -1
     if get_player(name,output=0) == -1:
-        return validate_player(input("Couldn't find "+ str(name) + ". Perhaps the name is mispelled? Please enter the correct name or \"c\" to cancel.\n"))
+        return validate_player(input("Couldn't find "+ str(name) + ". Perhaps the name is mispelled? Please enter the correct name or \"c\" to skip this offer.\n"))
     else:
+        #if get_player_fa(name) == -1:
+
         return(name)
+
 
 def validate_playername_offers(sheet):
     sheet['ratings']=''
@@ -163,16 +177,19 @@ def validate_playername_offers(sheet):
     for row in sheet.itertuples():
         #print(row.Index)
         realname = validate_player(row.player)
-        if realname == -1:
+        if realname == -1 or get_player_fa(realname) == -1:
             continue
         sheet.iloc[row.Index,3] = realname
         sheet.iloc[row.Index,7] = str(get_player_pos(realname))+ ' ' + str(get_player_age(realname)) + 'y ' + str(get_player_ratings(realname)['ovr']) + ' ' + str(get_player_ratings(realname)['pot'])
         sheet.iloc[row.Index,8] = get_player_ratings(realname)['ovr']
-        output = sheet[['team','player','ratings','salary','years','pitch', 'ovr']]
-    return output
+        output = sheet
+        #print(output)
+    output[output.ovr>0][['time','user','team','player','salary','years','pitch']].sort_values('player').to_csv('newoffers.csv',index=False)
+    return output[['team','player','ratings','salary','years','pitch', 'ovr']]
 
 def print_multioffers(sheet):
     multioffers = sheet[sheet.duplicated('player',keep=False)]
+    multioffers = multioffers[multioffers.ovr > 0]
     multioffers.sort_values('player')
     multioffers['random'] = ""
     multioffers['jackets'] = ""
@@ -190,7 +207,7 @@ def sign_singleoffers(sheet):
     print('Signing single offers... ')
     singleoffers= singleoffers.sort_values('ovr', ascending = True)
     for row in singleoffers.itertuples():
-        if row.ovr :
+        if row.ovr:
             sign_player(row.player,tid_from_teamname(row.team),row.salary,row.years)
 
 
@@ -207,16 +224,29 @@ def rookie_resignings(season):
                     player['born']['loc'] = player['born']['loc'] + ' - {0} TO'.format(current_year+4)
                 sign_player(player['firstName'] + ' ' + player['lastName'],player['draft']['tid'],salary,3, rookie = True)
 
+def extend_options(draft, excluded):
+    i=1
+    for player in data['players']:
+        name = player['firstName'] + ' ' + player['lastName']
+        if player['draft']['year'] == draft and player['draft']['round']==1 and name not in excluded:
+            player['contract']['exp'] += 1
+            print(name)
+            print(i)
+            i+=1
 
-
-current_year=data['gameAttributes'][44]['value']
-#rookie_resignings(2027)
+#rookie_resignings(2028)
 #newoffers = pd.DataFrame({'A' : []})
 #print(get_player('Chris Thompson'))
+
+
 newoffers = validate_playername_offers(offers)
+
 print_multioffers(newoffers)
 sign_singleoffers(newoffers)
 
+
+#extend_options(2024, ['Phil Thomas', 'Cameron Lingenfelter', 'Rickey Burns', 'Zach Rivers', 'Andy Bimonte', 'Kevin Hines', 'Chance Shepard'])
+#extend_options(2025, ['Beau Catlin', 'Camden Williams'])
 
 #print(validate_player('barney'))
 #print(multioffers.sort_values('player'))
@@ -226,11 +256,15 @@ sign_singleoffers(newoffers)
 #sign_player('Shaheen Douglas','san',12,3)
 #sign_player('Steven Compton', 'was', 10,2)
 #sign_player('Eric Mosure', 'nyc', 2,1)
-#sign_player('Jaylen Brown', 'xxx', 1, 1)
 
 
 
 
+# sign_player('Kyle Pickard', 'phi', 4, 3)
+# sign_player('B.J. Sandberg', 'bos', 2.5, 2)
+# sign_player('Ty Johnson', 'phi', 5, 2)
+# sign_player('Jeff Bucci', 'mon', 3.5, 1)
+# sign_player('D\'Marius Butler', 'sf', 12.5, 2)
 #print(tiers['OL'].head(50))
 
 
@@ -239,6 +273,8 @@ sign_singleoffers(newoffers)
 
 
 jsonoutput = open('edited.json', mode='w')
+
+
 json.dump(data, jsonoutput, indent=4)
 
 
