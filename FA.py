@@ -30,7 +30,7 @@ tiers['S'] = pd.read_csv("tiers/STiers.csv", index_col=0)
 tiers['P'] = pd.read_csv("tiers/KPTiers.csv", index_col=0)
 tiers['K'] = pd.read_csv("tiers/KPTiers.csv", index_col=0)
 rookiecontracts = pd.read_csv("tiers/rookiecontracts.csv", index_col=0)
-print(rookiecontracts)
+#print(rookiecontracts)
 #converting between emojis like 'mxc' to 'Mexico City Aztecs'
 
 with open('abbrev.csv', mode='r') as infile:
@@ -234,24 +234,35 @@ def extend_options(draft, excluded):
             print(i)
             i+=1
 
-#rookie_resignings(2028)
-#newoffers = pd.DataFrame({'A' : []})
-#print(get_player('Chris Thompson'))
+###-------------------------------------------------------------------------
+### below here you can edit the file
 
+###lines starting with 1 or more "#" symbols are disabled. you can disable or enable lines by placing #'s
+
+
+#This is to automatically resign rookies of a specific draft year (here 2028)
+#rookie_resignings(2028)
+
+
+
+#These 3 lines process the offers.csv table.
+#All multioffers are saved for voting in a seperate sheet called "multioffers.csv". Download that and upload it to google sheets, then post in discord for voting
+#All single offers are attempted to be signed (doesnt work if below tier or isn't a free agent.)
 
 newoffers = validate_playername_offers(offers)
-
 print_multioffers(newoffers)
 sign_singleoffers(newoffers)
 
+# This function is to extend rookie options of a specific draft
+# first argument (2025) is the year
+# second argument "['Beau Catlin', 'Camden Williams']" are the guys that had their TO refused. (Won't be extended)
 
-#extend_options(2024, ['Phil Thomas', 'Cameron Lingenfelter', 'Rickey Burns', 'Zach Rivers', 'Andy Bimonte', 'Kevin Hines', 'Chance Shepard'])
 #extend_options(2025, ['Beau Catlin', 'Camden Williams'])
 
-#print(validate_player('barney'))
-#print(multioffers.sort_values('player'))
+# This is to sign individual players, for someone thats missing in the sheet, or when you finished voting on multioffers you can write one of these lines per player.
+# arguments are: 1. player name, 2. team ID or team emoji, 3. salary in millions, 4. amount of years
 
-#sign_player('Marc Copp',15,salary=12,years=3)
+#sign_player('Ben Massey',15,salary=25,years=3)
 #sign_player('Quincy McAllister','mxc',salary=30,years=3)
 #sign_player('Shaheen Douglas','san',12,3)
 #sign_player('Steven Compton', 'was', 10,2)
@@ -260,11 +271,7 @@ sign_singleoffers(newoffers)
 
 
 
-# sign_player('Kyle Pickard', 'phi', 4, 3)
-# sign_player('B.J. Sandberg', 'bos', 2.5, 2)
-# sign_player('Ty Johnson', 'phi', 5, 2)
-# sign_player('Jeff Bucci', 'mon', 3.5, 1)
-# sign_player('D\'Marius Butler', 'sf', 12.5, 2)
+
 #print(tiers['OL'].head(50))
 
 
@@ -274,7 +281,8 @@ sign_singleoffers(newoffers)
 
 jsonoutput = open('edited.json', mode='w')
 
-
+#this line decides if you want to produce an updated export in the end or not, if you just want to try around you can disable it.
+# If its disabled it will still give you all the messages like "xxx is not a free agent" or "signed xxx to a yy contract" but it won't save an export anywhere
 json.dump(data, jsonoutput, indent=4)
 
 
