@@ -10,10 +10,10 @@ export = open('export.json')
 data = json.load(codecs.open('export.json', 'r+', 'utf-8-sig'))
 
 #fixed=input('Did you already fix the player names? (only say yes if you already ran the script with the current offers.csv and fixed the names)\n (type \'y\' or \'n\')')
-offers= pd.read_csv('offers.csv', names=['time','user','team','player','salary','years','pitch'],header=0)
+offers= pd.read_csv('newoffers.csv', names=['time','user','team','player','salary','years','pitch'],header=0)
 
 pd.options.mode.chained_assignment = None
-current_year=data['gameAttributes'][44]['value']
+
 
 #reading tier tables
 
@@ -135,15 +135,17 @@ def sign_player(name,team,salary,years,rookie = False):
     notFA=0
     for player in data['players']:
         if name == player['firstName'] + ' ' + player['lastName']:
+            #print(name)
             if rookie == True:
                 if player['draft']['year'] != current_year:
                     continue
             if player['tid'] != -1:
-                print(player['tid'])
+                #print(player['tid'])
                 notFA=1
                 continue
             else:
                 player['contract']['amount'] = salary * 1000
+                print(salary)
                 player['contract']['exp'] = current_year + years
                 player['tid'] = team
                 if(rookie==False):
@@ -241,14 +243,14 @@ def extend_options(draft, excluded):
 
 
 #This is to automatically resign rookies of a specific draft year (here 2028)
-#rookie_resignings(2028)
-
+#rookie_resignings(2029)
+current_year=2029
 
 
 #These 3 lines process the offers.csv table.
 #All multioffers are saved for voting in a seperate sheet called "multioffers.csv". Download that and upload it to google sheets, then post in discord for voting
 #All single offers are attempted to be signed (doesnt work if below tier or isn't a free agent.)
-
+#get_player_pos('Steven Compton')
 newoffers = validate_playername_offers(offers)
 print_multioffers(newoffers)
 sign_singleoffers(newoffers)
@@ -266,12 +268,17 @@ sign_singleoffers(newoffers)
 #sign_player('Quincy McAllister','mxc',salary=30,years=3)
 #sign_player('Shaheen Douglas','san',12,3)
 #sign_player('Steven Compton', 'was', 10,2)
-#sign_player('Eric Mosure', 'nyc', 2,1)
-
-
-
-
-
+#sign_player('Deion Hawley', 'por', 30,1)
+#sign_player('Steven Malveau', 'san', 5,2)
+#sign_player('Christian Whittingham', 'cle', 3,1)
+#sign_player('Darell Duncan', 'por', 30,1)
+#sign_player('Ted Ramirez', 'den', 1,1)
+#sign_player('Mike Childress', 'mxc', 0.7,1)
+#sign_player('Jarred Johnson', 'mxc', 3,1)
+#sign_player('Will Wilson', 'sac', 10,2)
+#sign_player('Ryan Fraites', 'mxc', 3,1)
+#sign_player('Luke Hoehne', 'mxc', 0.5,1)
+#sign_player('Noah Pendleton', 'por', 15,1)
 #print(tiers['OL'].head(50))
 
 
