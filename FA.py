@@ -145,7 +145,7 @@ def sign_player(name,team,salary,years,rookie = False):
                 continue
             else:
                 player['contract']['amount'] = salary * 1000
-                print(salary)
+                #print(salary)
                 player['contract']['exp'] = current_year + years
                 player['tid'] = team
                 if(rookie==False):
@@ -241,10 +241,10 @@ def extend_options(draft, excluded):
 
 ###lines starting with 1 or more "#" symbols are disabled. you can disable or enable lines by placing #'s
 
+current_year=2030
 
 #This is to automatically resign rookies of a specific draft year (here 2028)
-#rookie_resignings(2029)
-current_year=2029
+# rookie_resignings(2030)
 
 
 #These 3 lines process the offers.csv table.
@@ -254,7 +254,11 @@ current_year=2029
 newoffers = validate_playername_offers(offers)
 print_multioffers(newoffers)
 sign_singleoffers(newoffers)
-
+# print(get_player_pos('Josh Regas'))
+# print(get_player_ratings('Josh Regas'))
+# print(str(get_player_age('Josh Regas')))
+# print(get_tier('Josh Regas'))
+# print(tiers[get_player_pos('Ben Massey')].loc[get_player_ratings('Josh Regas')['ovr']])
 # This function is to extend rookie options of a specific draft
 # first argument (2025) is the year
 # second argument "['Beau Catlin', 'Camden Williams']" are the guys that had their TO refused. (Won't be extended)
@@ -264,21 +268,30 @@ sign_singleoffers(newoffers)
 # This is to sign individual players, for someone thats missing in the sheet, or when you finished voting on multioffers you can write one of these lines per player.
 # arguments are: 1. player name, 2. team ID or team emoji, 3. salary in millions, 4. amount of years
 
-#sign_player('Ben Massey',15,salary=25,years=3)
-#sign_player('Quincy McAllister','mxc',salary=30,years=3)
-#sign_player('Shaheen Douglas','san',12,3)
-#sign_player('Steven Compton', 'was', 10,2)
-#sign_player('Deion Hawley', 'por', 30,1)
-#sign_player('Steven Malveau', 'san', 5,2)
-#sign_player('Christian Whittingham', 'cle', 3,1)
-#sign_player('Darell Duncan', 'por', 30,1)
-#sign_player('Ted Ramirez', 'den', 1,1)
-#sign_player('Mike Childress', 'mxc', 0.7,1)
-#sign_player('Jarred Johnson', 'mxc', 3,1)
-#sign_player('Will Wilson', 'sac', 10,2)
-#sign_player('Ryan Fraites', 'mxc', 3,1)
-#sign_player('Luke Hoehne', 'mxc', 0.5,1)
-#sign_player('Noah Pendleton', 'por', 15,1)
+
+# sign_player('LaDarrell Harris','den',salary=6.5,years=1)
+#
+# sign_player('Eli Boyd', 'den',6.5,1)
+# sign_player('Rio Forbes', 'mia', 0.5,1)
+# sign_player('Kendall Odofin', 'den', 2,1)
+#
+# sign_player('Lonnie Hoke', 'den', 6.5,1)
+# sign_player('Montis Franklin', 'den', 5,1)
+# sign_player('C.J. Keene', 'den', 0.6,2)
+# sign_player('Mike Schwarzer', 'mia', 3,1)
+#
+#
+# sign_player('Marvin Stapert', 'mon', 0.5,1)
+#
+#
+# sign_player('William Rison','nyc',salary=2,years=1)
+# sign_player('Nathan Rembert','nyc',1.5,1)
+# sign_player('John Brown', 'nyc', 1.5,1)
+# sign_player('Ricardo Conaway', 'pit',0.5,1)
+# sign_player('Devon Robinson', 'pit', 1.5,1)
+# sign_player('Ruben Watkins', 'pit', 1.7,1)
+
+#sign_player('Norman Adolpho', 'min', 20,1)
 #print(tiers['OL'].head(50))
 
 
@@ -290,7 +303,7 @@ jsonoutput = open('edited.json', mode='w')
 
 #this line decides if you want to produce an updated export in the end or not, if you just want to try around you can disable it.
 # If its disabled it will still give you all the messages like "xxx is not a free agent" or "signed xxx to a yy contract" but it won't save an export anywhere
-json.dump(data, jsonoutput, indent=4)
+json.dump(data, jsonoutput, indent=0)
 
 
 print('\n Created updated export.')
