@@ -10,8 +10,8 @@ export = open('export.json')
 data = json.load(codecs.open('export.json', 'r+', 'utf-8-sig'))
 
 #fixed=input('Did you already fix the player names? (only say yes if you already ran the script with the current offers.csv and fixed the names)\n (type \'y\' or \'n\')')
-offers= pd.read_csv('newoffers.csv', names=['time','user','team','player','salary','years','pitch'],header=0)
-
+offers= pd.read_csv('offers.csv', names=['time','user','team','player','salary','years','pitch'],header=0)
+multioffers = pd.read_csv('voting.csv')
 pd.options.mode.chained_assignment = None
 
 
@@ -121,7 +121,7 @@ def sign_player(name,team,salary,years,rookie = False):
     if rookie == False:
         tiervalue = get_tier(name)
         if salary < tiervalue:
-            print(name+': Salary below tier. The corresponding tier salary is $' + str(tiervalue) + 'M.')
+            print(name+': Salary below tier. The offer ' + str(salary) + ' was too low for the corresponding tier salary is $' + str(tiervalue) + 'M.')
             return -1
 
 
@@ -148,6 +148,7 @@ def sign_player(name,team,salary,years,rookie = False):
                 #print(salary)
                 player['contract']['exp'] = current_year + years
                 player['tid'] = team
+                player['watch'] = 'true'
                 if(rookie==False):
                     print('\nSigned {0} to the {1} for ${2}m until {3}.'.format(player['firstName'] + ' ' + player['lastName']
                         ,teamname_from_tid(player['tid']),player['contract']['amount']/1000,player['contract']['exp']))
@@ -191,17 +192,20 @@ def validate_playername_offers(sheet):
 
 def print_multioffers(sheet):
     multioffers = sheet[sheet.duplicated('player',keep=False)]
-    multioffers = multioffers[multioffers.ovr > 0]
+    multioffers = multioffers[multioffers.ovr> 0]
     multioffers.sort_values('player')
     multioffers['random'] = ""
     multioffers['jackets'] = ""
     multioffers['brian'] = ""
     multioffers['spartan'] = ""
     multioffers['lam'] = ""
+    multioffers['cubz'] = ""
+    multioffers['sciipi'] = ""
     #, , multioffers['brian'], multioffers['spartan'], multioffers['lam']
     #,'jackets','brian','spartan','lam'
     print('Saving multioffers table... ')
-    multioffers[['random','jackets','brian','spartan','lam','team','player','ratings','salary','years','pitch']].sort_values('player').to_csv('multioffers.csv',index=False)
+    #print(multioffers[multioffers.ovr <=60])
+    multioffers[['random','jackets','brian','spartan','cubz','sciipi','lam','team','player','ratings','salary','years','pitch']].sort_values('player').to_csv('multioffers.csv',index=False)
 
 
 def sign_singleoffers(sheet):
@@ -209,9 +213,16 @@ def sign_singleoffers(sheet):
     print('Signing single offers... ')
     singleoffers= singleoffers.sort_values('ovr', ascending = True)
     for row in singleoffers.itertuples():
-        if row.ovr:
-            sign_player(row.player,tid_from_teamname(row.team),row.salary,row.years)
+        #if row.ovr >= 60:
+        sign_player(row.player,tid_from_teamname(row.team),row.salary,row.years)
 
+def sign_multioffers(sheet):
+    print('Signing multi offers... ')
+
+    for row in sheet.itertuples():
+
+        if row.winner == 'w':
+            sign_player(row.player,tid_from_teamname(row.team),row.salary,row.years)
 
 def rookie_resignings(season):
     counter=1
@@ -241,7 +252,7 @@ def extend_options(draft, excluded):
 
 ###lines starting with 1 or more "#" symbols are disabled. you can disable or enable lines by placing #'s
 
-current_year=2030
+current_year=2031
 
 #This is to automatically resign rookies of a specific draft year (here 2028)
 # rookie_resignings(2030)
@@ -254,6 +265,7 @@ current_year=2030
 newoffers = validate_playername_offers(offers)
 print_multioffers(newoffers)
 sign_singleoffers(newoffers)
+#sign_multioffers(multioffers)
 # print(get_player_pos('Josh Regas'))
 # print(get_player_ratings('Josh Regas'))
 # print(str(get_player_age('Josh Regas')))
@@ -269,33 +281,23 @@ sign_singleoffers(newoffers)
 # arguments are: 1. player name, 2. team ID or team emoji, 3. salary in millions, 4. amount of years
 
 
-# sign_player('LaDarrell Harris','den',salary=6.5,years=1)
-#
-# sign_player('Eli Boyd', 'den',6.5,1)
-# sign_player('Rio Forbes', 'mia', 0.5,1)
-# sign_player('Kendall Odofin', 'den', 2,1)
-#
-# sign_player('Lonnie Hoke', 'den', 6.5,1)
-# sign_player('Montis Franklin', 'den', 5,1)
-# sign_player('C.J. Keene', 'den', 0.6,2)
-# sign_player('Mike Schwarzer', 'mia', 3,1)
-#
-#
-# sign_player('Marvin Stapert', 'mon', 0.5,1)
-#
-#
-# sign_player('William Rison','nyc',salary=2,years=1)
-# sign_player('Nathan Rembert','nyc',1.5,1)
-# sign_player('John Brown', 'nyc', 1.5,1)
-# sign_player('Ricardo Conaway', 'pit',0.5,1)
-# sign_player('Devon Robinson', 'pit', 1.5,1)
-# sign_player('Ruben Watkins', 'pit', 1.7,1)
 
-#sign_player('Norman Adolpho', 'min', 20,1)
-#print(tiers['OL'].head(50))
-
-
-
+#
+print('**Multioffers**')
+# sign_player('Norman Adolpho','lv',salary=6.5,years=2)
+# sign_player('Ariel Blow','la',salary=10,years=3)
+# sign_player('Andre Padilla','san',salary=13.77,years=3)
+#
+#
+#
+#
+#
+# sign_player('Jamie Parham','tor',salary=14,years=5)
+# sign_player('Kylan Hayes','chi',salary=14,years=3)
+# sign_player('Rafael Morris','san',salary=15,years=1)
+# sign_player('William Elms','den',salary=17,years=1)
+# sign_player('Andrew Riley','kc',salary=20,years=2)
+# sign_player('Sam Ryan','mon',salary=28.5,years=3)
 
 
 
