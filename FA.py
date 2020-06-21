@@ -106,6 +106,7 @@ def get_tier(name):
         return tiers[get_player_pos(name)].loc[get_player_ratings(name)['ovr']].at[str(get_player_age(name))]
     except:
         print('Could not find ' + str(name) + '\'s tier value.')
+        return -1
 
 
 def sign_player(name,team,salary,years,rookie = False):
@@ -119,10 +120,16 @@ def sign_player(name,team,salary,years,rookie = False):
         print(name+': The max salary is $30m')
         return -1
     if rookie == False:
+
         tiervalue = get_tier(name)
+        # if(years == 1):
+        #     print('allowed')
         if salary < tiervalue:
             print(name+': Salary below tier. The offer ' + str(salary) + ' was too low for the corresponding tier salary is $' + str(tiervalue) + 'M.')
-            return -1
+            if name == 'Michael Joplin:':
+                a=2
+            else:
+                return -1
 
 
 
@@ -165,6 +172,8 @@ def sign_player(name,team,salary,years,rookie = False):
 def validate_player(name):
     if (name == 'c'):
         return -1
+    if name[-1:] == ' ':
+        name = name[:-1]
     if get_player(name,output=0) == -1:
         return validate_player(input("Couldn't find "+ str(name) + ". Perhaps the name is mispelled? Please enter the correct name or \"c\" to skip this offer.\n"))
     else:
@@ -213,12 +222,12 @@ def sign_singleoffers(sheet):
     print('Signing single offers... ')
     singleoffers= singleoffers.sort_values('ovr', ascending = True)
     for row in singleoffers.itertuples():
-        #if row.ovr >= 60:
+        # if row.ovr >= 60:
+        #     sign_player(row.player,tid_from_teamname(row.team),row.salary,row.years)
         sign_player(row.player,tid_from_teamname(row.team),row.salary,row.years)
-
 def sign_multioffers(sheet):
     print('Signing multi offers... ')
-
+    sheet = sheet.sort_values('salary')
     for row in sheet.itertuples():
 
         if row.winner == 'w':
@@ -252,7 +261,7 @@ def extend_options(draft, excluded):
 
 ###lines starting with 1 or more "#" symbols are disabled. you can disable or enable lines by placing #'s
 
-current_year=2031
+current_year=2032
 
 #This is to automatically resign rookies of a specific draft year (here 2028)
 # rookie_resignings(2030)
@@ -265,7 +274,7 @@ current_year=2031
 newoffers = validate_playername_offers(offers)
 print_multioffers(newoffers)
 sign_singleoffers(newoffers)
-#sign_multioffers(multioffers)
+#
 # print(get_player_pos('Josh Regas'))
 # print(get_player_ratings('Josh Regas'))
 # print(str(get_player_age('Josh Regas')))
@@ -284,22 +293,15 @@ sign_singleoffers(newoffers)
 
 #
 print('**Multioffers**')
-# sign_player('Norman Adolpho','lv',salary=6.5,years=2)
-# sign_player('Ariel Blow','la',salary=10,years=3)
-# sign_player('Andre Padilla','san',salary=13.77,years=3)
+sign_multioffers(multioffers)
 #
 #
 #
 #
-#
-# sign_player('Jamie Parham','tor',salary=14,years=5)
-# sign_player('Kylan Hayes','chi',salary=14,years=3)
-# sign_player('Rafael Morris','san',salary=15,years=1)
-# sign_player('William Elms','den',salary=17,years=1)
-# sign_player('Andrew Riley','kc',salary=20,years=2)
-# sign_player('Sam Ryan','mon',salary=28.5,years=3)
 
 
+# sign_player('Anuar Sexton','den',salary=8,years=1)
+#
 
 jsonoutput = open('edited.json', mode='w')
 
