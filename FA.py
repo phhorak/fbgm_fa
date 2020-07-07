@@ -293,7 +293,7 @@ sign_singleoffers(newoffers)
 
 #
 print('**Multioffers**')
-sign_multioffers(multioffers)
+#sign_multioffers(multioffers)
 #
 #
 #
