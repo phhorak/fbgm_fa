@@ -11,7 +11,7 @@ data = json.load(codecs.open('export.json', 'r+', 'utf-8-sig'))
 
 #fixed=input('Did you already fix the player names? (only say yes if you already ran the script with the current offers.csv and fixed the names)\n (type \'y\' or \'n\')')
 offers= pd.read_csv('offers.csv', names=['time','user','team','player','salary','years','pitch'],header=0)
-multioffers = pd.read_csv('voting.csv')
+#multioffers = pd.read_csv('voting.csv')
 pd.options.mode.chained_assignment = None
 
 
@@ -261,7 +261,7 @@ def extend_options(draft, excluded):
 
 ###lines starting with 1 or more "#" symbols are disabled. you can disable or enable lines by placing #'s
 
-current_year=2032
+current_year=2033
 
 #This is to automatically resign rookies of a specific draft year (here 2028)
 # rookie_resignings(2030)
