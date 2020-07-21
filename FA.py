@@ -261,7 +261,7 @@ def extend_options(draft, excluded):
 
 ###lines starting with 1 or more "#" symbols are disabled. you can disable or enable lines by placing #'s
 
-current_year=2033
+current_year=2034
 
 #This is to automatically resign rookies of a specific draft year (here 2028)
 # rookie_resignings(2030)
