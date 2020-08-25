@@ -224,7 +224,11 @@ def sign_singleoffers(sheet):
     for row in singleoffers.itertuples():
         # if row.ovr >= 60:
         #     sign_player(row.player,tid_from_teamname(row.team),row.salary,row.years)
-        sign_player(row.player,tid_from_teamname(row.team),row.salary,row.years)
+        name = row.player
+        if row.player[-1:] == ' ':
+            name = row.player[:-1]
+
+        sign_player(name,tid_from_teamname(row.team),row.salary,row.years)
 def sign_multioffers(sheet):
     print('Signing multi offers... ')
     sheet = sheet.sort_values('salary')
@@ -261,10 +265,10 @@ def extend_options(draft, excluded):
 
 ###lines starting with 1 or more "#" symbols are disabled. you can disable or enable lines by placing #'s
 
-current_year=2034
+current_year=2036
 
 #This is to automatically resign rookies of a specific draft year (here 2028)
-# rookie_resignings(2030)
+# rookie_resignings(2036)
 
 
 #These 3 lines process the offers.csv table.
@@ -274,7 +278,7 @@ current_year=2034
 newoffers = validate_playername_offers(offers)
 print_multioffers(newoffers)
 sign_singleoffers(newoffers)
-#
+
 # print(get_player_pos('Josh Regas'))
 # print(get_player_ratings('Josh Regas'))
 # print(str(get_player_age('Josh Regas')))
