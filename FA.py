@@ -26,7 +26,7 @@ current_phase=get_phase(data)
 
 newoffers = validate_playername_offers(data,offers, current_season)
 print_multioffers(newoffers,current_season)
-sign_singleoffers(data,newoffers,current_season)
+sign_singleoffers(data,newoffers,current_season, phase=current_phase)
 
 # This function is to extend rookie options of a specific draft
 # second argument (2025) is the year
@@ -37,16 +37,12 @@ sign_singleoffers(data,newoffers,current_season)
 # This is to sign individual players, for someone thats missing in the sheet, or when you finished voting on multioffers you can write one of these lines per player.
 # arguments are: 2. player name, 3. team ID or team emoji, 4. salary in millions, 5. amount of year
 
-# sign_player(data,'Adam Scales','den',salary=30,years=1, year=current_season)
-
-
-
-
+# sign_player(data,'Adam Scales','den',salary=30,years=1, year=current_season, phase=current_phase)
 
 jsonoutput = open('edited.json', mode='w')
 #this line decides if you want to produce an updated export in the end or not, if you just want to try around you can disable it.
 # If its disabled it will still give you all the messages like "xxx is not a free agent" or "signed xxx to a yy contract" but it won't save an export anywhere
-#json.dump(data, jsonoutput, indent=0)
+json.dump(data, jsonoutput, indent=0)
 
 
 print('\n Created updated export.')
